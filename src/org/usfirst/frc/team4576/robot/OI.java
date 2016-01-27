@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4576.robot;
 
+import org.usfirst.frc.team4576.robot.commands.Shift;
+
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 

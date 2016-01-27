@@ -1,42 +1,51 @@
 
 package org.usfirst.frc.team4576.robot;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+
+import org.usfirst.frc.team4576.robot.commands.AutoEnableCompressor;
+import org.usfirst.frc.team4576.robot.commands.Autonomous;
+import org.usfirst.frc.team4576.robot.commands.DriveWithJoysticks;
 import org.usfirst.frc.team4576.robot.subsystems.Chassis;
+import org.usfirst.frc.team4576.robot.subsystems.OnboardAccel;
 import org.usfirst.frc.team4576.robot.subsystems.Pneumatics;
 
-
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
- */
 public class Robot extends IterativeRobot {
 
 	public static final Chassis chassis = new Chassis();
 	public static final Pneumatics pneumatics = new Pneumatics();
+	public static final OnboardAccel accel = new OnboardAccel();
 	public static OI oi;
-	public static Joystick leftstick;
+	
+	public static Joystick leftstick = new Joystick(0);
+	public static final String VERSION = "1.0.0 TEST";
 
     Command autonomousCommand;
     Command teleopCommand;
+    Command compressorStart;
+    CameraServer server;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
+		System.out.println("RNR 2016" + VERSION + "is loading.....");
 		oi = new OI();
-        // instantiate the command used for the autonomous period
+		autonomousCommand = new Autonomous();
+		teleopCommand = new DriveWithJoysticks();
+		compressorStart = new AutoEnableCompressor();
+		
+		server = CameraServer.getInstance();
+        server.setQuality(50);
+        server.startAutomaticCapture("cam0");
+        //the camera name (ex "cam0") can be found through the roborio web interface
         //autonomousCommand = new ExampleCommand();
         
-    	//public static Joystick leftstick = new Joystick(0);
-
     }
 	
 	public void disabledPeriodic() {
@@ -61,6 +70,8 @@ public class Robot extends IterativeRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
+        teleopCommand.start();
+        compressorStart.start();
     }
 
     /**
